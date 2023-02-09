@@ -34,13 +34,13 @@ pipeline {
             
         }
 
-        // stage('Retriving CommitID'){
-        //     steps{
-        //         script {
-        //             commitId = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
-        //         }
-        //     }
-        // }
+        stage('Retriving CommitID'){
+            steps{
+                script {
+                    commitId = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
+                }
+            }
+        }
 
         // stage('Git Checkout'){
         //     steps{
