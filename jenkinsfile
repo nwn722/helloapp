@@ -5,7 +5,7 @@ def ECS_CLUSTER_NAME = "ECS-CLUSTER-SN"
 def ECS_SERVICE_NAME = "hellosvc"
 def GIT_REPO = "git@github.com:nwn722/helloapp.git"
 def BRANCH_NAME = params.BRANCH_NAME ?: "main"
-def COMMIT_ID = ""
+
 
 def awsConfig(body) {
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
@@ -35,7 +35,7 @@ pipeline {
             }
 
             steps {
-                   COMMIT_ID = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
+                  def COMMIT_ID = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
             }
             
         }
