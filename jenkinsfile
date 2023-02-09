@@ -1,57 +1,57 @@
 def AWS_ACCOUNT_ID = "715451173743"
 def IMAGE = "helloapp"
-def REGION = "ap-northeast-1" 
+def REGION = "ap-northeast-1"
 def GIT_REPO = "git@github.com:nwn722/helloapp.git"
+def BRANCH_NAME = params.BRANCH_NAME ?: "main"
+
+def awsConfig(body) {
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                      accessKeyVariable:'AWS_ACCESS_KEY_ID',
+                      secretKeyVariable:'AWS_SECRET_ACCESS_KEY',
+                      credentialsId:'sandbox-cred']]) {
+        body()
+    }
+}
+
 pipeline {
+    parameters {
+        string(defaultValue: "main", description: "Branch name", name: "BRANCH_NAME")
+    }
     agent {
         label 'aws.ec2.ap.east.jenkins.worker'
     }
     stages {
         stage('Clone repository') {
             steps {
-                // git branch: 'main',
-                // credentialsId: 'nwn722',
-                // url: "$GIT_REPO"
-
                 checkout scmGit(
-                    branches: [[name: 'main']], 
-                    extensions: [], 
-                    userRemoteConfigs: [[credentialsId: 'nwn722', 
-                    url: 'git@github.com:nwn722/helloapp.git']])
+                    branches: [[name: BRANCH_NAME]],
+                    extensions: [],
+                    userRemoteConfigs: [[credentialsId: 'nwn722',
+                    url: ${GIT_REPO}]])
             }
         }
-         stage('Build Docker Image') {
-             steps {
-                 sh 'make ENV=PROD build-container'
-             }
-         }
-          stage('Push Docker Image to ECR') {
-              steps {
-                  
-                  withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                    accessKeyVariable:'AWS_ACCESS_KEY_ID', 
-                                    secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
-                                    credentialsId:'sandbox-cred']]) {
-                      sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-                      sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
-                      sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
-                      sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
-                      sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
-                    }         
-             }
-         }
-
-
-          stage("Update the ECS service") {
+        stage('Build Docker Image') {
             steps {
-
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                    accessKeyVariable:'AWS_ACCESS_KEY_ID', 
-                                    secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
-                                    credentialsId:'sandbox-cred']]) {
-                    sh "aws ecs update-service --cluster ECS-CLUSTER-SN --service hellosvc --force-new-deployment --region ${REGION}"
-                                    }
-             }
-         }
+                sh 'make ENV=PROD build-container'
+            }
+        }
+        stage('Push Docker Image to ECR') {
+            steps {
+                awsConfig {
+                    sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+                    sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                    sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+                }
+            }
+        }
+        stage("Update the ECS service") {
+            steps {
+             awsConfig {
+                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment --region ${REGION}"
+                }
+            }
+        }
     }
 }
