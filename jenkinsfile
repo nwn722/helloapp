@@ -10,7 +10,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                 git branch: 'main',
-                credentialsId: 'nwnkey',
+                credentialsId: 'nwn722',
                 url: "$GIT_REPO"
             }
         }
