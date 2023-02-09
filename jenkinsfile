@@ -5,6 +5,7 @@ def ECS_CLUSTER_NAME = "ECS-CLUSTER-SN"
 def ECS_SERVICE_NAME = "hellosvc"
 def GIT_REPO = "git@github.com:nwn722/helloapp.git"
 def BRANCH_NAME = params.BRANCH_NAME ?: "main"
+def commitId = ''
 
 
 def awsConfig(body) {
@@ -32,7 +33,10 @@ pipeline {
                     userRemoteConfigs: [[credentialsId: 'nwn722',
                     url: GIT_REPO]])   
 
-                    def commitId = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
+                  
+                script {
+                    commitId = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
+                    }
             }
             
         }
