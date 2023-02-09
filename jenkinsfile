@@ -10,7 +10,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                 git branch: 'master',
-                credentialsId: 'bitbucket-key',
+                credentialsId: 'nwnkey',
                 url: "$GIT_REPO"
             }
         }
