@@ -19,7 +19,7 @@ pipeline {
                  sh 'make ENV=PROD build-container'
              }
          }
-          stage('Login to AWS ECR') {
+          stage('Push Docker Image to ECR') {
               steps {
                   
                   withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
@@ -27,18 +27,14 @@ pipeline {
                                     secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
                                     credentialsId:'sandbox-cred']]) {
                       sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+                      sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                      sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                      sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+                      sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
                     }         
              }
          }
-          stage('Push Docker Image to ECR') {
-              steps {
-         
-                          sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
-                          sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
-                          sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
-                          sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
-             }
-         }
+
 
         //   stage("Start ECS Service") {
         //     steps {
