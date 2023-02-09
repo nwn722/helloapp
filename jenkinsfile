@@ -14,7 +14,7 @@ pipeline {
                 // url: "$GIT_REPO"
 
                 checkout scmGit(
-                    branches: [[name: '*/main']], 
+                    branches: [[name: '097ce95f2ffdff008f007e5e2e760197751dbc71']], 
                     extensions: [], 
                     userRemoteConfigs: [[credentialsId: 'nwn722', 
                     url: 'git@github.com:nwn722/helloapp.git']])
