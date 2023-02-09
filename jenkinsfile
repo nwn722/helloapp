@@ -1,0 +1,50 @@
+def AWS_ACCOUNT_ID = "715451173743"
+def IMAGE = "helloapp"
+def REGION = "ap-northeast-1" 
+def GIT_REPO = "git@github.com:nwn722/helloapp.git"
+pipeline {
+    agent {
+        label 'aws.ec2.ap.east.jenkins.worker'
+    }
+    stages {
+        stage('Clone repository') {
+            steps {
+                git branch: 'master',
+                credentialsId: 'bitbucket-key',
+                url: "$GIT_REPO"
+            }
+        }
+         stage('Build Docker Image') {
+             steps {
+                 sh 'make ENV=PROD build-container'
+             }
+         }
+          stage('Login to AWS ECR') {
+              steps {
+                  
+                  withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                    accessKeyVariable:'AWS_ACCESS_KEY_ID', 
+                                    secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
+                                    credentialsId:'sandbox-cred']]) {
+                      sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+                    }         
+             }
+         }
+          stage('Push Docker Image to ECR') {
+              steps {
+         
+                          sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                          sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                          sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+                          sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+             }
+         }
+
+        //   stage("Start ECS Service") {
+        //     steps {
+        //         // Trigger the ECS service pipeline and pass the build number
+        //         build job: 'cd-ecs-svc', parameters: [string(name: 'BUILD_NUMBER', value: "${env.BUILD_NUMBER}")]
+        //      }
+        //  }
+    }
+}
