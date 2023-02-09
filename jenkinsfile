@@ -24,10 +24,10 @@ pipeline {
         stage('Clone repository') {
             steps {
                 checkout scmGit(
-                    branches: [[name: ${BRANCH_NAME}]],
+                    branches: [[name: BRANCH_NAME]],
                     extensions: [],
                     userRemoteConfigs: [[credentialsId: 'nwn722',
-                    url: ${GIT_REPO}]])
+                    url: GIT_REPO]])
             }
         }
         stage('Build Docker Image') {
