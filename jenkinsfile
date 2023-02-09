@@ -30,11 +30,14 @@ pipeline {
                     branches: [[name: BRANCH_NAME]],
                     extensions: [],
                     userRemoteConfigs: [[credentialsId: 'nwn722',
-                    url: GIT_REPO]])
-
-                    commitId = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+                    url: GIT_REPO]])   
 
             }
+
+            steps {
+                commitId = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
+            }
+            
         }
         stage('Build Docker Image') {
             steps {
