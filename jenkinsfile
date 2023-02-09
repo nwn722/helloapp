@@ -14,7 +14,7 @@ pipeline {
                 // url: "$GIT_REPO"
 
                 checkout scmGit(
-                    branches: [[name: '097ce95f2ffdff008f007e5e2e760197751dbc71']], 
+                    branches: [[name: 'main']], 
                     extensions: [], 
                     userRemoteConfigs: [[credentialsId: 'nwn722', 
                     url: 'git@github.com:nwn722/helloapp.git']])
@@ -49,7 +49,7 @@ pipeline {
                                     accessKeyVariable:'AWS_ACCESS_KEY_ID', 
                                     secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
                                     credentialsId:'sandbox-cred']]) {
-                    sh "aws ecs update-service --cluster ECS-CLUSTER-SN --service hellosvc --force-new-deployment"
+                    sh "aws ecs update-service --cluster ECS-CLUSTER-SN --service hellosvc --force-new-deployment --region ${REGION}"
                                     }
              }
          }
