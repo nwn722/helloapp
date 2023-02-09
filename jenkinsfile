@@ -1,6 +1,8 @@
 def AWS_ACCOUNT_ID = "715451173743"
 def IMAGE = "helloapp"
 def REGION = "ap-northeast-1"
+def ECS_CLUSTER_NAME = "ECS-CLUSTER-SN"
+def ECS_SERVICE_NAME = "hellosvc"
 def GIT_REPO = "git@github.com:nwn722/helloapp.git"
 def BRANCH_NAME = params.BRANCH_NAME ?: "main"
 
