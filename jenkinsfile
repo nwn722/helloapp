@@ -9,9 +9,9 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                git branch: 'main',
-                credentialsId: 'nwn722',
-                url: "$GIT_REPO"
+                // git branch: 'main',
+                // credentialsId: 'nwn722',
+                // url: "$GIT_REPO"
 
                 checkout scmGit(
                     branches: [[name: '*/main']], 
