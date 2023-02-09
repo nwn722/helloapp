@@ -42,11 +42,16 @@ pipeline {
          }
 
 
-        //   stage("Start ECS Service") {
-        //     steps {
-        //         // Trigger the ECS service pipeline and pass the build number
-        //         build job: 'cd-ecs-svc', parameters: [string(name: 'BUILD_NUMBER', value: "${env.BUILD_NUMBER}")]
-        //      }
-        //  }
+          stage("Update the ECS service") {
+            steps {
+
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                    accessKeyVariable:'AWS_ACCESS_KEY_ID', 
+                                    secretKeyVariable:'AWS_SECRET_ACCESS_KEY', 
+                                    credentialsId:'sandbox-cred']]) {
+                    sh "aws ecs update-service --cluster ECS-CLUSTER-SN --service hellosvc --force-new-deployment"
+                                    }
+             }
+         }
     }
 }
