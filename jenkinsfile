@@ -32,9 +32,6 @@ pipeline {
                     userRemoteConfigs: [[credentialsId: 'nwn722',
                     url: GIT_REPO]])   
 
-            }
-
-            steps {
                   def COMMIT_ID = sh(returnStdout: true, script: "git rev-parse ${BRANCH_NAME}").trim()
             }
             
