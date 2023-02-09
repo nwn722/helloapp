@@ -5,6 +5,7 @@ def ECS_CLUSTER_NAME = "ECS-CLUSTER-SN"
 def ECS_SERVICE_NAME = "hellosvc"
 def GIT_REPO = "git@github.com:nwn722/helloapp.git"
 def BRANCH_NAME = params.BRANCH_NAME ?: "main"
+def commitId
 
 def awsConfig(body) {
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
@@ -31,7 +32,8 @@ pipeline {
                     userRemoteConfigs: [[credentialsId: 'nwn722',
                     url: GIT_REPO]])
 
-                     echo ">>>>>>>>>>>>>>>> Current Commit ID: ${env.GIT_COMMIT} <<<<<<<<<<<<<<<<<<<<<<<"
+                    commitId = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+
             }
         }
         stage('Build Docker Image') {
@@ -43,10 +45,10 @@ pipeline {
             steps {
                 awsConfig {
                     sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-                    sh "docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
+                    sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
                     sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:latest"
-                    sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
-                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${BUILD_NUMBER}"
+                    sh "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${commitId}"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE}:${commitId}"
                 }
             }
         }
