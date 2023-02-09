@@ -30,6 +30,8 @@ pipeline {
                     extensions: [],
                     userRemoteConfigs: [[credentialsId: 'nwn722',
                     url: GIT_REPO]])
+
+                     echo ">>>>>>>>>>>>>>>> Current Commit ID: ${env.GIT_COMMIT} <<<<<<<<<<<<<<<<<<<<<<<"
             }
         }
         stage('Build Docker Image') {
