@@ -19,7 +19,7 @@ def awsConfig(body) {
 
 pipeline {
     parameters {
-        string(defaultValue: "main", description: "Branch name", name: "BRANCH_NAME")
+        string(defaultValue: "main", description: "Branch name / Commit ID", name: "BRANCH_NAME")
     }
     agent {
         label 'aws.ec2.ap.east.jenkins.worker'
