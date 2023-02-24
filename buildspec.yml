@@ -13,6 +13,7 @@ phases:
       # - docker build -t $REPOSITORY_URI:latest .
       - make ENV=PROD build-container
       - docker tag helloapp:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker tag helloapp:latest $REPOSITORY_URI:latest
   post_build:
     commands:
       - echo Build completed on `date`
