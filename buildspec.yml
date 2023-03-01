@@ -11,7 +11,7 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       # - docker build -t $REPOSITORY_URI:latest .
-      - make ENV=PROD build-container
+      - make ENV=UAT build-container
       - docker tag helloapp:latest $REPOSITORY_URI:$IMAGE_TAG
       - docker tag helloapp:latest $REPOSITORY_URI:latest
   post_build:
@@ -23,7 +23,7 @@ phases:
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      # - echo Writing image definitions file...
-      # - printf '[{"name":"'$ecs_container_name'","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-# artifacts:
-#     files: imagedefinitions.json
+      - echo Writing image definitions file...
+      - printf '[{"name":"helloapp-container","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
