@@ -6,6 +6,7 @@ phases:
       - REPOSITORY_URI=715451173743.dkr.ecr.ap-northeast-1.amazonaws.com/helloapp
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - apt install make
   build:
     commands:
       - echo Build started on `date`
