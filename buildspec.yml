@@ -10,7 +10,6 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      # - docker build -t $REPOSITORY_URI:latest .
       - make ENV=UAT build-container
       - docker tag helloapp:latest $REPOSITORY_URI:$IMAGE_TAG
       - docker tag helloapp:latest $REPOSITORY_URI:latest
