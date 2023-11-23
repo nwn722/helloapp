@@ -50,4 +50,4 @@ jobs:
           git push -q origin main
 
         env:
-          PAT_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
