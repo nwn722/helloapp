@@ -37,8 +37,8 @@ jobs:
 
       - name: Set Git user identity
         run: |
-        git config --global user.email "nwn722@gmail.com"
-        git config --global user.name "nwn-722"
+          git config --global user.email "nwn722@gmail.com"
+          git config --global user.name "nwn-722"
 
       - name: Set Git credential helper
         run: git config --global credential.helper wincred       
