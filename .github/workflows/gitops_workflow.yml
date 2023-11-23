@@ -47,4 +47,4 @@ jobs:
           git remote set-url origin "https://github.com/nwn722/kube_manifest.git"
           git add manifest/deployment.yaml
           git commit -m "new build with imgTag build-$TAG"
-          git push -q origin main
+          git push -q "https://${{ secrets.GH_TOKEN }}@github.com/nwn722/kube_manifest.git" main
